@@ -1,11 +1,11 @@
 <template>
   <div class="page">
     <header class="topbar">
-      <img src="/logo-intuitive.png" alt="Logo" class="logo" />
+      <img src="./assets/logo-intuitive-care.jpg" alt="Logo Intuitive Care" class="logo" />
     </header>
 
     <main class="main">
-      <div class="left">
+      <div class="content">
         <h2>Busca de Operadoras</h2>
         <p class="description">
           Digite o nome da operadora para buscar informações com base nos dados da ANS.
@@ -27,10 +27,6 @@
         </ul>
 
         <div v-if="erro" class="error">{{ erro }}</div>
-      </div>
-
-      <div class="right">
-        <img src="/robo.png" alt="Robo" class="robo" />
       </div>
     </main>
   </div>
@@ -80,5 +76,81 @@ export default {
 }
 
 .topbar {
-  padding: 20px;
-  border-bottom:
+  padding: 20px 40px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 36px;
+}
+
+.main {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.content {
+  max-width: 600px;
+  width: 100%;
+}
+
+h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background-color: #a678e2;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #7e5bd7;
+}
+
+.result-list {
+  margin-top: 30px;
+  list-style: none;
+  padding: 0;
+}
+
+.result-item {
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.loading {
+  margin-top: 10px;
+  color: #555;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+</style>
