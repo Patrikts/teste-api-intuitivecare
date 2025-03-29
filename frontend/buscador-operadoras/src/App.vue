@@ -1,26 +1,38 @@
 <template>
-  <div class="container">
-    <h1>Busca de Operadoras - ANS</h1>
+  <div class="page">
+    <header class="topbar">
+      <img src="/logo-intuitive.png" alt="Logo" class="logo" />
+    </header>
 
-    <input v-model="termo" @keyup.enter="buscar" placeholder="Digite a razão social..." />
-    <button @click="buscar">Buscar</button>
+    <main class="main">
+      <div class="left">
+        <h2>Busca de Operadoras</h2>
+        <p class="description">
+          Digite o nome da operadora para buscar informações com base nos dados da ANS.
+        </p>
 
-    <div v-if="loading">Buscando...</div>
+        <input v-model="termo" @keyup.enter="buscar" placeholder="Ex: Amil, Unimed, Bradesco Saúde..." />
+        <button @click="buscar">Buscar</button>
 
-    <div v-if="resultados.length">
-      <h2>Resultados:</h2>
-      <ul>
-        <li v-for="(item, index) in resultados" :key="index">
-          <strong>{{ item.razao_social }}</strong><br />
-          Registro ANS: {{ item.registro_ans }}<br />
-          CNPJ: {{ item.cnpj }}<br />
-          UF: {{ item.uf }} | Município: {{ item.municipio }}<br />
-          Similaridade: {{ item.pontuacao }}%
-        </li>
-      </ul>
-    </div>
+        <div v-if="loading" class="loading">Buscando...</div>
 
-    <div v-if="erro">{{ erro }}</div>
+        <ul v-if="resultados.length" class="result-list">
+          <li v-for="(item, index) in resultados" :key="index" class="result-item">
+            <h3>{{ item.razao_social }}</h3>
+            <p><strong>Registro ANS:</strong> {{ item.registro_ans }}</p>
+            <p><strong>CNPJ:</strong> {{ item.cnpj }}</p>
+            <p><strong>UF:</strong> {{ item.uf }} | <strong>Município:</strong> {{ item.municipio }}</p>
+            <p><strong>Similaridade:</strong> {{ item.pontuacao }}%</p>
+          </li>
+        </ul>
+
+        <div v-if="erro" class="error">{{ erro }}</div>
+      </div>
+
+      <div class="right">
+        <img src="/robo.png" alt="Robo" class="robo" />
+      </div>
+    </main>
   </div>
 </template>
 
@@ -57,23 +69,16 @@ export default {
 };
 </script>
 
-<style>
-.container {
-  max-width: 600px;
-  margin: auto;
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap');
+
+.page {
+  font-family: 'Montserrat', sans-serif;
+  color: #111;
+  background-color: #fff;
+  min-height: 100vh;
+}
+
+.topbar {
   padding: 20px;
-}
-input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-}
-button {
-  padding: 8px 12px;
-}
-li {
-  margin-bottom: 12px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
-}
-</style>
+  border-bottom:
