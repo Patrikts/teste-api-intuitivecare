@@ -8,10 +8,20 @@
       <div class="content">
         <h2>Busca de Operadoras</h2>
         <p class="description">
-          Digite o nome da operadora para buscar informações com base nos dados da ANS.
+          Digite o nome da operadora, CNPJ ou nome fantasia para buscar informações com base nos dados da ANS.
         </p>
 
-        <input v-model="termo" @keyup.enter="buscar" placeholder="Ex: Amil, Unimed, Bradesco Saúde..." />
+        <input v-model="termo" placeholder="Nome, fantasia ou CNPJ..." />
+
+        <div class="filters">
+          <select v-model="uf">
+            <option value="">UF (opcional)</option>
+            <option v-for="estado in ufs" :key="estado" :value="estado">{{ estado }}</option>
+          </select>
+
+          <input v-model="cidade" placeholder="Cidade (opcional)" />
+        </div>
+
         <button @click="buscar">Buscar</button>
 
         <div v-if="loading" class="loading">Buscando...</div>
@@ -19,12 +29,19 @@
         <ul v-if="resultados.length" class="result-list">
           <li v-for="(item, index) in resultados" :key="index" class="result-item">
             <h3>{{ item.razao_social }}</h3>
+            <p><strong>Nome Fantasia:</strong> {{ item.nome_fantasia }}</p>
             <p><strong>Registro ANS:</strong> {{ item.registro_ans }}</p>
             <p><strong>CNPJ:</strong> {{ item.cnpj }}</p>
             <p><strong>UF:</strong> {{ item.uf }} | <strong>Município:</strong> {{ item.municipio }}</p>
             <p><strong>Similaridade:</strong> {{ item.pontuacao }}%</p>
           </li>
         </ul>
+
+        <div v-if="resultados.length" class="pagination">
+          <button @click="anterior" :disabled="pagina === 1">Anterior</button>
+          <span>Página {{ pagina }}</span>
+          <button @click="proxima" :disabled="pagina * limite >= total">Próxima</button>
+        </div>
 
         <div v-if="erro" class="error">{{ erro }}</div>
       </div>
@@ -39,9 +56,19 @@ export default {
   data() {
     return {
       termo: "",
+      uf: "",
+      cidade: "",
       resultados: [],
+      pagina: 1,
+      limite: 5,
+      total: 0,
       loading: false,
-      erro: ""
+      erro: "",
+      ufs: [
+        "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO",
+        "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR",
+        "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"
+      ]
     };
   },
   methods: {
@@ -52,13 +79,33 @@ export default {
 
       try {
         const response = await axios.get("http://localhost:8000/buscar", {
-          params: { q: this.termo }
+          params: {
+            q: this.termo,
+            uf: this.uf || undefined,
+            cidade: this.cidade || undefined,
+            page: this.pagina,
+            limit: this.limite
+          }
         });
+
         this.resultados = response.data.resultados;
+        this.total = response.data.total_encontrado;
       } catch (err) {
         this.erro = "Erro ao buscar dados.";
       } finally {
         this.loading = false;
+      }
+    },
+    anterior() {
+      if (this.pagina > 1) {
+        this.pagina--;
+        this.buscar();
+      }
+    },
+    proxima() {
+      if (this.pagina * this.limite < this.total) {
+        this.pagina++;
+        this.buscar();
       }
     }
   }
@@ -93,7 +140,7 @@ export default {
 }
 
 .content {
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
 }
 
@@ -109,13 +156,24 @@ h2 {
   margin-bottom: 30px;
 }
 
-input {
+input, select {
   width: 100%;
   padding: 12px;
   font-size: 16px;
   margin-bottom: 10px;
   border-radius: 10px;
   border: 1px solid #ccc;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filters select, .filters input {
+  flex: 1;
+  min-width: 150px;
 }
 
 button {
@@ -127,6 +185,7 @@ button {
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.3s ease;
+  margin-bottom: 20px;
 }
 
 button:hover {
@@ -134,7 +193,6 @@ button:hover {
 }
 
 .result-list {
-  margin-top: 30px;
   list-style: none;
   padding: 0;
 }
@@ -142,6 +200,13 @@ button:hover {
 .result-item {
   border-bottom: 1px solid #eee;
   padding: 12px 0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .loading {
